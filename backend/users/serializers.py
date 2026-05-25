@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 User = get_user_model()
 
@@ -22,3 +23,20 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'username', 'avatar', 'created_at']
+
+class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = User.USERNAME_FIELD
+    
+    def validate(self, attrs):
+        credentials = {
+            'email': attrs.get('email'),
+            'password': attrs.get('password'),
+        }
+        
+        user = User.objects.filter(email=credentials['email']).first()
+        
+        if user and user.check_password(credentials['password']):
+            attrs[self.username_field] = credentials['email']
+            return super().validate(attrs)
+        
+        raise serializers.ValidationError('Invalid email or password.')
