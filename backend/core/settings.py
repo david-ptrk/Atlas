@@ -105,3 +105,5 @@ REST_FRAMEWORK = {
 
 # Anthropic
 ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
+
+AUTH_USER_MODEL = 'users.User'
