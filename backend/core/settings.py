@@ -115,3 +115,6 @@ SIMPLE_JWT = {
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
 }
+
+# Groq
+GROQ_API_KEY = os.getenv('GROQ_API_KEY')
