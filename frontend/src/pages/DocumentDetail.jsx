@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, href } from 'react-router-dom'
-import { getDocument, deleteDocument } from "../api/documents";
+import { getDocument, deleteDocument, askQuestion } from "../api/documents";
 
 export default function DocumentDetail() {
     const { id } = useParams()
@@ -8,12 +8,45 @@ export default function DocumentDetail() {
     const [doc, setDoc] = useState(null)
     const [loading, setLoading] = useState(true)
     const [activeTab, setActiveTab] = useState('summary')
+    const [highlight, setHighlight] = useState('')
+    const [question, setQuestion] = useState('')
+    const [answer, setAnswer] = useState('')
+    const [asking, setAsking] = useState(false)
+    const [showAskBox, setShowAskBox] = useState(false)
+    const askBoxRef = useRef(null)
     
     useEffect(() => {
         getDocument(id)
             .then(setDoc)
             .finally(() => setLoading(false))
     }, [id])
+    
+    const handleTextSelection = () => {
+        const selection = window.getSelection()
+        const selected = selection?.toString().trim()
+        if (selected && selected.length > 10) {
+            setHighlight(selected)
+            setShowAskBox(true)
+            setAnswer('')
+            setTimeout(() => askBoxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100)
+        }
+    }
+    
+    const handleAsk = async () => {
+        if (!question.trim()) return
+        setAsking(true)
+        setAnswer('')
+        try {
+            const res = await askQuestion(id, question, highlight)
+            setAnswer(res.answer)
+        }
+        catch (err) {
+            setAnswer('Failed to get answer. Please try again.')
+        }
+        finally {
+            setAsking(false)
+        }
+    }
     
     const handleDelete = async () => {
         if (!confirm('Delete this document?')) return
@@ -147,17 +180,73 @@ export default function DocumentDetail() {
                 </div>
                 
                 {/* Tab content */}
-                <div className="bg-gray-900 rounded-xl p-6">
+                <div className="bg-gray-900 rounded-xl p-6 mb-6">
                     {activeTab === 'summary' ? (
-                        <div className="leading-relaxed">
-                            {renderSummary(doc.summary)}
-                        </div>
+                        <div className="leading-relaxed">{renderSummary(doc.summary)}</div>
                     ): (
-                        <div className="text-gray-400 text-sm leading-relaxed whitespace-pre-wrap max-h-150 overflow-y-auto">
+                        <div
+                            onMouseUp={handleTextSelection}
+                            className="text-gray-400 text-sm leading-relaxed whitespace-pre-wrap max-h-150 overflow-y-auto select-text cursor-text"
+                        >
                             {doc.extracted_text || 'No text extracted.'}
                         </div>
                     )}
                 </div>
+                
+                {/* Highlight tip */}
+                {activeTab === 'text' && !showAskBox && (
+                    <p className="text-gray-600 text-xs text-center mb-6">
+                        Select any text above to ask AI a question about it
+                    </p>
+                )}
+                
+                {/* Ask box */}
+                {showAskBox && (
+                    <div ref={askBoxRef} className="bg-gray-900 rounded-xl p-6">
+                        
+                        {/* Highlighted text */}
+                        {highlight && (
+                            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 mb-4">
+                                <p className="text-yellow-400 text-xs font-medium mb-1">Selected text</p>
+                                <p className="text-gray-300 text-sm line-clamp-3">{highlight}</p>
+                            </div>
+                        )}
+                        
+                        {/* Question input */}
+                        <div className="flex gap-3">
+                            <input 
+                                type="text"
+                                value={question}
+                                onChange={(e) => setQuestion(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleAsk()}
+                                placeholder="Ask a question about this text..."
+                                className="flex-1 bg-gray-800 text-white rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            <button
+                                onClick={handleAsk}
+                                disabled={asking || !question.trim()}
+                                className="bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2.5 rounded-lg transition disabled:opacity-50"
+                            >
+                                {asking ? '...' : 'Ask'}
+                            </button>
+                            <button
+                                onClick={() => { setShowAskBox(false); setHighlight(''); setAnswer(''); setQuestion('') }}
+                                className="text-gray-600 hover:text-white text-sm px-3 py-2.5 rounded-lg transition"
+                            >
+                                X
+                            </button>
+                        </div>
+                        
+                        {/* Asnwer */}
+                        {answer && (
+                            <div className="mt-4 bg-gray-800 rounded-lg p-4">
+                                <p className="text-blue-400 text-xs font-medium mb-2">AI Answer</p>
+                                <p className="text-gray-300 text-sm leading-relaxed">{answer}</p>
+                            </div>
+                        )}
+                        
+                    </div>
+                )}
                 
             </div>
             

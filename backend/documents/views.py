@@ -3,8 +3,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from .models import Document
-from .serializers import DocumentSerializer, DocumentUploadSerializer, DocumentDetailSerializer
-from .utils import extract_text_from_pdf, generate_summary
+from .serializers import DocumentSerializer, DocumentDetailSerializer
+from .utils import extract_text_from_pdf, generate_summary, ask_question
 import os
 
 class DocumentListView(APIView):
@@ -76,3 +76,26 @@ class DocumentDetailView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Document.DoesNotExist:
             return Response({'error': 'Document not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+class DocumentAskView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, pk):
+        try:
+            document = Document.objects.get(pk=pk, user=request.user)
+        except Document.DoesNotExist:
+            return Response({'error': 'Document not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        question = request.data.get('question', '').strip()
+        highlighted_text = request.data.get('highlighted_text', '').strip()
+        
+        if not question:
+            return Response({'error': 'Question is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        answer = ask_question(
+            document_text = document.extracted_text,
+            highlighted_text=highlighted_text,
+            question=question
+        )
+        
+        return Response({'answer': answer})

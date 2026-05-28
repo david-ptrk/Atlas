@@ -26,3 +26,11 @@ export const getDocument = async (id) => {
     const res = await api.get(`/documents/${id}/`)
     return res.data
 }
+
+export const askQuestion = async (id, question, highlightedText = '') => {
+    const res = await api.post(`/documents/${id}/ask/`, {
+        question,
+        highlighted_text: highlightedText
+    })
+    return res.data
+}
