@@ -30,17 +30,23 @@ def generate_summary(text):
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a research assistant. Summarize documents clearly and concisely."
+                    "content": "You are a research assistant. Write clean, readable summaries. Never add colons after bullet points. Never repeat the format labels in the output."
                 },
                 {
                     "role": "user",
-                    "content": f"""Summarize this document in this format:
-**Main Topic:** (1 sentence)
-**Key Points:**
-- point 1
-- point 2
-- point 3
-**Conclusion:** (1-2 sentences)
+                    "content": f"""Summarize this document. Use this exact structure, no extra punctuation:
+
+**Main Topic**
+One clear sentence about what this document is about.
+
+**Key Points**
+- First key point
+- Second key point
+- Third key point
+- Fourth key point (if needed)
+
+**Conclusion**
+One or two sentences wrapping up the main takeaway.
 
 Document:
 {text[:4000]}"""

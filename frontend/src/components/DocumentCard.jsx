@@ -1,4 +1,8 @@
+import { useNavigate } from "react-router-dom"
+
 export default function DocumentCard({ doc, onDelete }) {
+    const navigate = useNavigate()
+    
     const formatSize = (bytes) => {
         if (bytes < 1024) return `${bytes} B`
         if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
@@ -18,7 +22,10 @@ export default function DocumentCard({ doc, onDelete }) {
     }
     
     return (
-        <div className="bg-gray-900 rounded-xl p-5 hover:bg-gray-800 transition group">
+        <div
+            onClick={() => navigate(`/documents/${doc.id}`)}
+            className="bg-gray-900 rounded-xl p-5 hover:bg-gray-800 transition group"
+        >
             <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3 flex-1 min-w-0">
                     <div className="text-2xl mt-0.5">📄</div>
@@ -34,7 +41,7 @@ export default function DocumentCard({ doc, onDelete }) {
                     </div>
                 </div>
                 <button
-                    onClick={() => onDelete(doc.id)}
+                    onClick={(e) => { e.stopPropagation(); onDelete(doc.id) }}
                     className="text-gray-700 hover:text-red-400 transition opacity-0 group-hover:opacity-100 text-lg"
                 >
                     🗑

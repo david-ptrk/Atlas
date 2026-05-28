@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { uploadDocument } from "../api/document";
+import { uploadDocument } from "../api/documents";
 
 export default function UploadModal({ onClose, onUploaded }) {
     const [file, setFile] = useState(null)

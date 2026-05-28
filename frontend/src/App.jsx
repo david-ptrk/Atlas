@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import Dashboard from './pages/Dashboard.jsx'
+import DocumentDetail from './pages/DocumentDetail.jsx'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -17,6 +18,9 @@ function AppRoutes() {
       <Route path="/register" element={<Register key="register" />} />
       <Route path="/dashboard" element={
         <ProtectedRoute><Dashboard /></ProtectedRoute>
+      } />
+      <Route path="/documents/:id" element={
+        <ProtectedRoute><DocumentDetail /></ProtectedRoute>
       } />
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>

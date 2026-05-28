@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { getDocuments, deleteDocument } from "../api/document";
+import { getDocuments, deleteDocument } from "../api/documents";
 import UploadModal from "../components/UploadModal";
 import DocumentCard from "../components/DocumentCard";
 

@@ -21,3 +21,8 @@ export const getDocuments = async () => {
 export const deleteDocument = async (id) => {
     await api.delete(`/documents/${id}/`)
 }
+
+export const getDocument = async (id) => {
+    const res = await api.get(`/documents/${id}/`)
+    return res.data
+}
