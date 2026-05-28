@@ -1,5 +1,12 @@
 from django.db import models
 from django.conf import settings
+import uuid
+import os
+
+def document_upload_path(instance, filename):
+    ext = os.path.splitext(filename)[1]
+    unique_name = f"{uuid.uuid4().hex}{ext}"
+    return f"documents/{instance.user.id}/{unique_name}"
 
 class Document(models.Model):
     STATUS_CHOICES = [
@@ -10,7 +17,7 @@ class Document(models.Model):
     
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='documents')
     title = models.CharField(max_length=255)
-    file = models.FileField(upload_to='documents/')
+    file = models.FileField(upload_to=document_upload_path)
     file_type = models.CharField(max_length=50)
     file_size = models.PositiveIntegerField()
     extracted_text = models.TextField(blank=True)
