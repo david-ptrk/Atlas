@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Document
+from .models import Document, Note
 
 class DocumentSerializer(serializers.ModelSerializer):
     file_url = serializers.SerializerMethodField()
@@ -35,3 +35,8 @@ class DocumentDetailSerializer(serializers.ModelSerializer):
         if obj.file and request:
             return request.build_absolute_uri(obj.file.url)
         return None
+
+class NoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Note
+        fields = ['id', 'title', 'content', 'document', 'created_at', 'updated_at']
