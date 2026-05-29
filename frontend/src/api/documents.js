@@ -34,3 +34,27 @@ export const askQuestion = async (id, question, highlightedText = '') => {
     })
     return res.data
 }
+
+export const getNotes = async (documentId = null) => {
+    const url = documentId ? `/documents/notes/?document=${documentId}` : '/documents/notes'
+    const res = await api.get(url)
+    return res.data
+}
+
+export const createNote = async (title, noteContent, documentId = null) => {
+    const res = await api.post('/documents/notes/', {
+        title,
+        content: noteContent,
+        document: documentId
+    })
+    return res.data
+}
+
+export const updateNote = async (id, title, content) => {
+    const res = await api.put(`/documents/notes/${id}/`, { title, content })
+    return res.data
+}
+
+export const deleteNote = async (id) => {
+    await api.delete(`/documents/notes/${id}/`)
+}

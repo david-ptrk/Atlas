@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, href } from 'react-router-dom'
 import { getDocument, deleteDocument, askQuestion } from "../api/documents";
+import NotesPanel from "../components/NotesPanel";
 
 export default function DocumentDetail() {
     const { id } = useParams()
@@ -164,7 +165,7 @@ export default function DocumentDetail() {
                 
                 {/* Tabs */}
                 <div className="flex gap-1 bg-gray-900 p-1 rounded-xl mb-6 w-fit">
-                    {['summary', 'text'].map(tab => (
+                    {['summary', 'text', 'notes'].map(tab => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
@@ -174,7 +175,7 @@ export default function DocumentDetail() {
                                     : 'text-gray-500 hover:text-white'
                                 }`}
                         >
-                            {tab === 'summary' ? 'AI Summary' : 'Extracted Test'}
+                            {tab === 'summary' ? 'AI Summary' : tab === 'text' ? 'Extracted Test' : 'Notes'}
                         </button>
                     ))}
                 </div>
@@ -183,13 +184,15 @@ export default function DocumentDetail() {
                 <div className="bg-gray-900 rounded-xl p-6 mb-6">
                     {activeTab === 'summary' ? (
                         <div className="leading-relaxed">{renderSummary(doc.summary)}</div>
-                    ): (
+                    ) : activeTab === 'text' ? (
                         <div
                             onMouseUp={handleTextSelection}
                             className="text-gray-400 text-sm leading-relaxed whitespace-pre-wrap max-h-150 overflow-y-auto select-text cursor-text"
                         >
                             {doc.extracted_text || 'No text extracted.'}
                         </div>
+                    ) : (
+                        <NotesPanel documentId={doc.id} />
                     )}
                 </div>
                 
