@@ -6,6 +6,7 @@ from .models import Document, Note
 from .serializers import DocumentSerializer, DocumentDetailSerializer, NoteSerializer
 from .utils import extract_text_from_pdf, generate_summary, ask_question
 import os
+from django.db import models
 
 class DocumentListView(APIView):
     permission_classes = [IsAuthenticated]
@@ -147,3 +148,22 @@ class NoteDetailView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Note.DoesNotExist:
             return Response({'error': 'Note not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+class DocumentSearchView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        query = request.query_params.get('q', '').strip()
+        if not query:
+            return Response([])
+        
+        documents = Document.objects.filter(
+            user=request.user
+        ).filter(
+            models.Q(title__icontains=query) |
+            models.Q(summary__icontains=query) |
+            models.Q(extracted_text__icontains=query)
+        )
+        
+        serializer = DocumentSerializer(documents, many=True, context={'request': request})
+        return Response(serializer.data)

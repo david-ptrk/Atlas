@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { getDocuments, deleteDocument } from "../api/documents";
 import UploadModal from "../components/UploadModal";
 import DocumentCard from "../components/DocumentCard";
+import SearchBar from "../components/SearchBar";
 
 export default function Dashboard() {
     const { user, logout } = useAuth()
@@ -58,6 +59,11 @@ export default function Dashboard() {
                     >
                         + Upload PDF
                     </button>
+                </div>
+                
+                {/* Search */}
+                <div className="mb-8">
+                    <SearchBar />
                 </div>
                 
                 {/* Documents grid */}
