@@ -11,7 +11,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-in-production'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.1.4", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -92,7 +92,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # CORS — allow React dev server
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 # JWT Auth
 REST_FRAMEWORK = {
