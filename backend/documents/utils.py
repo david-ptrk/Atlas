@@ -33,7 +33,7 @@ def generate_summary(text):
     try:
         client = Groq(api_key=settings.GROQ_API_KEY)
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {
                     "role": "system",
@@ -56,11 +56,11 @@ One clear sentence about what this document is about.
 One or two sentences wrapping up the main takeaway.
 
 Document:
-{text[:4000]}"""
+{text[:6000]}"""
                 }
             ],
             temperature=0.3,
-            max_tokens=500,
+            max_tokens=800,
         )
         return response.choices[0].message.content
     except Exception as e:
