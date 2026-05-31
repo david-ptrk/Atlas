@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import (DocumentListView, DocumentUploadView, DocumentDetailView,
-    DocumentAskView, NoteListView, NoteDetailView, DocumentSearchView
+    DocumentAskView, NoteListView, NoteDetailView, DocumentSearchView,
+    DocumentCitationView
 )
 
 urlpatterns = [
@@ -11,4 +12,5 @@ urlpatterns = [
     path('notes/<int:pk>/', NoteDetailView.as_view(), name='note-detail'),
     path('<int:pk>/', DocumentDetailView.as_view(), name='document-detail'),
     path('<int:pk>/ask/', DocumentAskView.as_view(), name='document-ask'),
+    path('<int:pk>/citation/', DocumentCitationView.as_view(), name='document-citation'),
 ]

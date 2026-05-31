@@ -27,6 +27,11 @@ class Document(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='processing')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    # Citation metadata
+    author = models.CharField(max_length=255, blank=True)
+    publication_date = models.CharField(max_length=50, blank=True)
+    publisher = models.CharField(max_length=255, blank=True)
+    url = models.URLField(blank=True)
     
     class Meta:
         ordering = ['-created_at']

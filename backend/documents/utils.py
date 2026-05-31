@@ -2,6 +2,7 @@ import fitz
 from groq import Groq
 from django.conf import settings
 from sentence_transformers import SentenceTransformer
+import json
 
 embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
 
@@ -95,3 +96,71 @@ def ask_question(document_text, highlighted_text, question):
     except Exception as e:
         print(f"Ask question error: {e}")
         return "Sorry, I could not process your question. Please try again."
+
+def extract_metadata(text):
+    """Extract citation metadata from document text using Groq."""
+    try:
+        client = Groq(api_key=settings.GROQ_API_KEY)
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a research assistant. Extract metadata from documents. Always respond with valid JSON only, no extra text."
+                },
+                {
+                    "role": "user",
+                    "content": f"""Extract the following from this document and return as JSON:
+- author (string, full name or names, empty string if not found)
+- publication_date (string, year or full date, empty string if not found)
+- publisher (string, journal, university or organization, empty string if not found)
+- title (string, document title, empty string if not found)
+
+Document:
+{text[:3000]}
+
+Return only valid JSON like:
+{{ "author": "John Smith", "publication_date": "2023", "publisher": "MIT Press", "title": "Example Title" }}"""
+                }
+            ],
+            temperature=0.1,
+            max_tokens=200,
+        )
+        content = response.choices[0].message.content.strip()
+        content = content.replace('```json', '').replace('```', '').strip()
+        return json.loads(content)
+    except Exception as e:
+        print(f"Metadata extraction error: {e}")
+        return {}
+
+def generate_citations(title, author, publication_date, publisher, url):
+    """Generate APA, MLA, and Chicago citations."""
+    author = author or "Unknown Author"
+    year = publication_date or "n.d."
+    publisher = publisher or ""
+    title = title or "Untitled"
+    
+    # APA
+    apa = f"{author} ({year}). {title}."
+    if publisher:
+        apa += f" {publisher}."
+    if url:
+        apa += f" Retrieved from {url}"
+    
+    # MLA
+    mla = f'{author} "{title}."'
+    if publisher:
+        mla += f" {publisher},"
+    mla += f" {year}."
+    if url:
+        mla += f" {url}."
+    
+    # Chicago
+    chicago = f'{author}. "{title}."'
+    if publisher:
+        chicago += f" {publisher},"
+    chicago += f" {year}."
+    if url:
+        chicago += f" Accessed from {url}."
+    
+    return {'apa': apa, 'mla': mla, 'chicago': chicago}

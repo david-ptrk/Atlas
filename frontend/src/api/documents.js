@@ -63,3 +63,13 @@ export const searchDocuments = async (query) => {
     const res = await api.get(`/documents/search/?q=${encodeURIComponent(query)}`)
     return res.data
 }
+
+export const getCitation = async (id) => {
+    const res = await api.get(`/documents/${id}/citation/`)
+    return res.data
+}
+
+export const updateCitationMetadata = async (id, metadata) => {
+    const res = await api.post(`/documents/${id}/citation/`, metadata)
+    return res.data
+}

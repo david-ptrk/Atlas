@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, href } from 'react-router-dom'
 import { getDocument, deleteDocument, askQuestion } from "../api/documents";
 import NotesPanel from "../components/NotesPanel";
+import CitationPanel from "../components/CitationPanel";
 
 export default function DocumentDetail() {
     const { id } = useParams()
@@ -165,17 +166,15 @@ export default function DocumentDetail() {
                 
                 {/* Tabs */}
                 <div className="flex gap-1 bg-gray-900 p-1 rounded-xl mb-6 w-fit">
-                    {['summary', 'text', 'notes'].map(tab => (
-                        <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
+                    {['summary', 'text', 'notes', 'citations'].map(tab => (
+                        <button key={tab} onClick={() => setActiveTab(tab)}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition capitalize
                                 ${activeTab === tab
                                     ? 'bg-blue-600 text-white'
                                     : 'text-gray-500 hover:text-white'
                                 }`}
                         >
-                            {tab === 'summary' ? 'AI Summary' : tab === 'text' ? 'Extracted Test' : 'Notes'}
+                            {tab === 'summary' ? 'AI Summary' : tab === 'text' ? 'Extracted Text' : tab === 'notes' ? 'Notes' : 'Citations'}
                         </button>
                     ))}
                 </div>
@@ -191,8 +190,10 @@ export default function DocumentDetail() {
                         >
                             {doc.extracted_text || 'No text extracted.'}
                         </div>
-                    ) : (
+                    ) : activeTab === 'notes' ? (
                         <NotesPanel documentId={doc.id} />
+                    ) : (
+                        <CitationPanel documentId={doc.id} documentTitle={doc.title} />
                     )}
                 </div>
                 

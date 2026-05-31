@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from .models import Document, Note
 from .serializers import DocumentSerializer, DocumentDetailSerializer, NoteSerializer
-from .utils import extract_text_from_pdf, generate_summary, ask_question, generate_embedding
+from .utils import extract_text_from_pdf, generate_summary, ask_question, generate_embedding, generate_citations, extract_metadata
 import os
 from django.db import models
 from pgvector.django import CosineDistance
@@ -46,10 +46,14 @@ class DocumentUploadView(APIView):
             extracted_text = extract_text_from_pdf(file_path)
             summary = generate_summary(extracted_text) if extracted_text else ""
             embedding = generate_embedding(extracted_text) if extracted_text else None
+            metadata = extract_metadata(extracted_text) if extracted_text else {}
             
             document.extracted_text = extracted_text
             document.summary = summary
             document.embedding = embedding
+            document.author = metadata.get('author', '')
+            document.publication_date = metadata.get('publication_date', '')
+            document.publisher = metadata.get('publisher', '')
             document.status = 'ready'
             document.save()
         except Exception as e:
@@ -182,3 +186,51 @@ class DocumentSearchView(APIView):
         
         serializer = DocumentSerializer(documents, many=True, context={'request': request})
         return Response(serializer.data)
+
+class DocumentCitationView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, pk):
+        try:
+            document = Document.objects.get(pk=pk, user=request.user)
+        except Document.DoesNotExist:
+            return Response({'error': 'Document not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        citations = generate_citations(
+            title=document.title,
+            author=document.author,
+            publication_date=document.publication_date,
+            publisher=document.publisher,
+            url=document.url
+        )
+        return Response({
+            'citations': citations,
+            'metadata': {
+                'author': document.author,
+                'publication_date': document.publication_date,
+                'publisher': document.publisher,
+                'url': document.url,
+            }
+        })
+    
+    def post(self, request, pk):
+        """Update citation metadata manually."""
+        try:
+            document = Document.objects.get(pk=pk, user=request.user)
+        except Document.DoesNotExist:
+            return Response({'error': 'Document not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        document.author = request.data.get('author', document.author)
+        document.publication_date = request.data.get('publication_date', document.publication_date)
+        document.publisher = request.data.get('publisher', document.publisher)
+        document.url = request.data.get('url', document.url)
+        document.save()
+        
+        citations = generate_citations(
+            title=document.title,
+            author=document.author,
+            publication_date=document.publication_date,
+            publisher=document.publisher,
+            url=document.url
+        )
+        return Response({'citations': citations})
