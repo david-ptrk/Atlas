@@ -1,6 +1,9 @@
 import fitz
 from groq import Groq
 from django.conf import settings
+from sentence_transformers import SentenceTransformer
+
+embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
 
 def extract_text_from_pdf(file_path):
     """Extract raw text from a PDF file."""
@@ -15,11 +18,14 @@ def extract_text_from_pdf(file_path):
         print(f"PDF extraction error: {e}")
         return ""
 
-# def generate_summary(text):
-#     """Placeholder — AI summary disabled until quota resets."""
-#     word_count = len(text.split())
-#     char_count = len(text)
-#     return f"Document contains approximately {word_count} words. AI summary will be generated when quota is available."
+def generate_embedding(text):
+    """Generate a vector embedding for the given text."""
+    try:
+        embedding = embedding_model.encode(text[:1000])
+        return embedding.tolist()
+    except Exception as e:
+        print(f"Embedding generation error: {e}")
+        return None
 
 def generate_summary(text):
     """Generate an AI summary using Groq."""

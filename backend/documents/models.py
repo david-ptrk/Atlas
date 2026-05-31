@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from pgvector.django import VectorField
 import uuid
 import os
 
@@ -22,6 +23,7 @@ class Document(models.Model):
     file_size = models.PositiveIntegerField()
     extracted_text = models.TextField(blank=True)
     summary = models.TextField(blank=True)
+    embedding = VectorField(dimensions=384, null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='processing')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

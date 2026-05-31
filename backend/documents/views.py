@@ -4,9 +4,10 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from .models import Document, Note
 from .serializers import DocumentSerializer, DocumentDetailSerializer, NoteSerializer
-from .utils import extract_text_from_pdf, generate_summary, ask_question
+from .utils import extract_text_from_pdf, generate_summary, ask_question, generate_embedding
 import os
 from django.db import models
+from pgvector.django import CosineDistance
 
 class DocumentListView(APIView):
     permission_classes = [IsAuthenticated]
@@ -44,9 +45,11 @@ class DocumentUploadView(APIView):
             file_path = document.file.path
             extracted_text = extract_text_from_pdf(file_path)
             summary = generate_summary(extracted_text) if extracted_text else ""
+            embedding = generate_embedding(extracted_text) if extracted_text else None
             
             document.extracted_text = extracted_text
             document.summary = summary
+            document.embedding = embedding
             document.status = 'ready'
             document.save()
         except Exception as e:
@@ -157,13 +160,25 @@ class DocumentSearchView(APIView):
         if not query:
             return Response([])
         
-        documents = Document.objects.filter(
-            user=request.user
-        ).filter(
-            models.Q(title__icontains=query) |
-            models.Q(summary__icontains=query) |
-            models.Q(extracted_text__icontains=query)
-        )
+        query_embedding = generate_embedding(query)
+        
+        if query_embedding:
+            documents = Document.objects.filter(
+                user=request.user,
+                embedding__isnull=False
+            ).annotate(
+                distance=CosineDistance('embedding', query_embedding)
+            ).filter(
+                distance__lt=0.8
+            ).order_by('distance')[:10]
+        else:
+            documents = Document.objects.filter(
+                user=request.user
+            ).filter(
+                models.Q(title__icontains=query) |
+                models.Q(summary__icontains=query) |
+                models.Q(extracted_text__icontains=query)
+            )
         
         serializer = DocumentSerializer(documents, many=True, context={'request': request})
         return Response(serializer.data)
