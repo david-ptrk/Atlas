@@ -4,12 +4,14 @@ import { getDocuments, deleteDocument } from "../api/documents";
 import UploadModal from "../components/UploadModal";
 import DocumentCard from "../components/DocumentCard";
 import SearchBar from "../components/SearchBar";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
     const { user, logout } = useAuth()
     const [documents, setDocuments] = useState([])
     const [showUpload, setShowUpload] = useState(false)
     const [loading, setLoading] = useState(true)
+    const navigate = useNavigate()
     
     useEffect(() => {
         getDocuments()
@@ -31,15 +33,16 @@ export default function Dashboard() {
             
             {/* Navbar */}
             <div className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
-                <h1 className="text-xl font-bold text-white">Atlas</h1>
+                <div className="flex items-center gap-6">
+                    <h1 className="text-xl font-bold">Atlas</h1>
+                    <nav className="flex gap-4 text-sm">
+                        <button className="text-white font-medium">Documents</button>
+                        <button onClick={() => navigate('/workspaces')} className="text-gray-500 hover:text-white transition">Workspaces</button>
+                    </nav>
+                </div>
                 <div className="flex items-center gap-4">
                     <span className="text-gray-400 text-sm">{user?.email}</span>
-                    <button
-                        onClick={logout}
-                        className="text-gray-500 hover:text-white text-sm transition"
-                    >
-                        Logout
-                    </button>
+                    <button onClick={logout} className="text-gray-500 hover:text-white text-sm transition">Logout</button>
                 </div>
             </div>
             
