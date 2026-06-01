@@ -7,7 +7,7 @@ class Workspace(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='owned_workspaces')
-    invite_mode = models.UUIDField(default=uuid.uuid4, unique=True)
+    invite_code = models.UUIDField(default=uuid.uuid4, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:

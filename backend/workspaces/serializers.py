@@ -25,10 +25,14 @@ class WorkspaceSerializer(serializers.ModelSerializer):
     member_count = serializers.SerializerMethodField()
     document_count = serializers.SerializerMethodField()
     role = serializers.SerializerMethodField()
+    invite_code = serializers.SerializerMethodField()
     
     class Meta:
         model = Workspace
         fields = ['id', 'name', 'description', 'owner_email', 'invite_code', 'member_count', 'document_count', 'role', 'created_at']
+    
+    def get_invite_code(self, obj):
+        return str(obj.invite_code)
     
     def get_member_count(self, obj):
         return obj.members.count()
