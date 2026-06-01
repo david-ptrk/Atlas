@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     # Our apps
     'users',
     'documents',
+    'workspaces',
 ]
 
 MIDDLEWARE = [
