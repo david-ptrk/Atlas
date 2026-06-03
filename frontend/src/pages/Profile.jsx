@@ -19,6 +19,7 @@ export default function Profile() {
     const [passMsg, setPassMsg] = useState('')
     const [passError, setPassError] = useState('')
     const [passLoading, setPassLoading] = useState(false)
+    const [showPasswords, setShowPasswords] = useState({ current: false, new: false, confirm: false })
     
     const handleAvatarChange = (e) => {
         const file = e.target.files[0]
@@ -162,30 +163,57 @@ export default function Profile() {
                     <div className="space-y-3 mb-4">
                         <div>
                             <label className="text-gray-400 text-sm mb-1 block">Current Password</label>
-                            <input
-                                type="password"
-                                value={passwords.current}
-                                onChange={e => setPasswords({ ...passwords, current: e.target.value })}
-                                className="w-full bg-gray-800 text-white rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showPasswords.current ? 'text' : 'password'}
+                                    value={passwords.current}
+                                    onChange={e => setPasswords({ ...passwords, current: e.target.value })}
+                                    className="w-full bg-gray-800 text-white rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPasswords({ ...showPasswords, current: !showPasswords.current })}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition text-xs"
+                                >
+                                    {showPasswords.current ? 'Hide' : 'Show'}
+                                </button>
+                            </div>
                         </div>
                         <div>
                             <label className="text-gray-400 text-sm mb-1 block">New Password</label>
-                            <input
-                                type="password"
-                                value={passwords.new}
-                                onChange={e => setPasswords({ ...passwords, new: e.target.value })}
-                                className="w-full bg-gray-800 text-white rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showPasswords.new ? 'text' : 'password'}
+                                    value={passwords.new}
+                                    onChange={e => setPasswords({ ...passwords, new: e.target.value })}
+                                    className="w-full bg-gray-800 text-white rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPasswords({ ...showPasswords, new: !showPasswords.new })}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition text-xs"
+                                >
+                                    {showPasswords.new ? 'Hide' : 'Show'}
+                                </button>
+                            </div>
                         </div>
                         <div>
                             <label className="text-gray-400 text-sm mb-1 block">Confirm New Password</label>
-                            <input
-                                type="password"
-                                value={passwords.confirm}
-                                onChange={e => setPasswords({ ...passwords, confirm: e.target.value })}
-                                className="w-full bg-gray-800 text-white rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showPasswords.confirm ? 'text' : 'password'}
+                                    value={passwords.confirm}
+                                    onChange={e => setPasswords({ ...passwords, confirm: e.target.value })}
+                                    className="w-full bg-gray-800 text-white rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPasswords({ ...showPasswords, confirm: !showPasswords.confirm })}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition text-xs"
+                                >
+                                    {showPasswords.confirm ? 'Hide' : 'Show'}
+                                </button>
+                            </div>
                         </div>
                     </div>
                     

@@ -8,6 +8,7 @@ export default function Login() {
     const [form, setForm] = useState({ email: '', password: '' })
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
     
     const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value })
     
@@ -58,15 +59,24 @@ export default function Login() {
                     
                     <div>
                         <label className="text-gray-400 text-sm mb-1 block">Password</label>
-                        <input
-                            name="password"
-                            type="password"
-                            value={form.password}
-                            onChange={handleChange}
-                            required
-                            className="w-full bg-gray-800 text-white rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="your password"
-                        />
+                        <div className="relative">
+                            <input
+                                name="password"
+                                type={showPassword ? 'text' : 'password'}
+                                value={form.password}
+                                onChange={handleChange}
+                                required
+                                className="w-full bg-gray-800 text-white rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="your password"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition text-xs"
+                            >
+                                {showPassword ? 'Hide' : 'Show'}
+                            </button>
+                        </div>
                     </div>
                     
                     <button
