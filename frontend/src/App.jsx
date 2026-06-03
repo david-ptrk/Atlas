@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard.jsx'
 import DocumentDetail from './pages/DocumentDetail.jsx'
 import Workspaces from './pages/Workspaces.jsx'
 import WorkspaceDetail from './pages/WorkspaceDetail.jsx'
+import Profile from './pages/Profile.jsx'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -31,6 +32,7 @@ function AppRoutes() {
         <ProtectedRoute><WorkspaceDetail /></ProtectedRoute>
       } />
       <Route path="*" element={<Navigate to="/login" />} />
+      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
     </Routes>
   )
 }

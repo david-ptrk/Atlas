@@ -62,6 +62,7 @@ export default function Workspaces() {
                 </div>
                 <div className="flex items-center gap-4">
                     <span className="text-gray-400 text-sm">{user?.email}</span>
+                    <button onClick={() => navigate('/profile')} className="text-gray-500 hover:text-white text-sm transition">Profile</button>
                     <button onClick={logout} className="text-gray-500 hover:text-white text-sm transition">Logout</button>
                 </div>
             </div>
