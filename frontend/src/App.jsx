@@ -7,6 +7,7 @@ import DocumentDetail from './pages/DocumentDetail.jsx'
 import Workspaces from './pages/Workspaces.jsx'
 import WorkspaceDetail from './pages/WorkspaceDetail.jsx'
 import Profile from './pages/Profile.jsx'
+import NotFound from './pages/NotFound.jsx'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -17,22 +18,15 @@ function ProtectedRoute({ children }) {
 function AppRoutes() {
   return (
     <Routes>
+      <Route path="/" element={<Login key="login" />} />
       <Route path="/login" element={<Login key="login" />} />
       <Route path="/register" element={<Register key="register" />} />
-      <Route path="/dashboard" element={
-        <ProtectedRoute><Dashboard /></ProtectedRoute>
-      } />
-      <Route path="/documents/:id" element={
-        <ProtectedRoute><DocumentDetail /></ProtectedRoute>
-      } />
-      <Route path="/workspaces" element={
-        <ProtectedRoute><Workspaces /></ProtectedRoute>
-      } />
-      <Route path="/workspaces/:id" element={
-        <ProtectedRoute><WorkspaceDetail /></ProtectedRoute>
-      } />
-      <Route path="*" element={<Navigate to="/login" />} />
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/documents/:id" element={<ProtectedRoute><DocumentDetail /></ProtectedRoute>} />
+      <Route path="/workspaces" element={<ProtectedRoute><Workspaces /></ProtectedRoute>} />
+      <Route path="/workspaces/:id" element={<ProtectedRoute><WorkspaceDetail /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   )
 }
