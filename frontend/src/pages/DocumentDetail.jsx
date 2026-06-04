@@ -3,6 +3,7 @@ import { useParams, useNavigate, href } from 'react-router-dom'
 import { getDocument, deleteDocument, askQuestion } from "../api/documents";
 import NotesPanel from "../components/NotesPanel";
 import CitationPanel from "../components/CitationPanel";
+import Navbar from "../components/Navbar";
 
 export default function DocumentDetail() {
     const { id } = useParams()
@@ -114,22 +115,12 @@ export default function DocumentDetail() {
     return (
         <div className="min-h-screen bg-gray-950 text-white">
             
-            {/* Navbar */}
-            <div className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <button
-                        onClick={() => navigate('/dashboard')}
-                        className="text-gray-500 hover:text-white transition text-sm"
-                    >
-                        ← Back
-                    </button>
-                    <span className="text-gray-700">|</span>
-                    <h1 className="text-white font-medium text-sm truncate max-w-xs">{doc.title}</h1>
-                </div>
-                <button
-                    onClick={handleDelete}
-                    className="text-gray-600 hover:text-red-400 transition text-sm"
-                >
+            <Navbar />
+            <div className="px-6 py-3 border-b border-gray-800 flex items-center justify-between">
+                <button onClick={() => navigate('/dashboard')} className="text-gray-500 hover:text-white transition text-sm">
+                    ← Back to Documents
+                </button>
+                <button onClick={handleDelete} className="text-gray-600 hover:text-red-400 transition text-sm">
                     Delete
                 </button>
             </div>

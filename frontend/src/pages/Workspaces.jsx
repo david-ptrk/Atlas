@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom'
 import { getWorkspaces, createWorkspace, joinWorkspace } from "../api/workspaces";
 import { useAuth } from '../context/AuthContext'
+import Navbar from "../components/Navbar";
 
 export default function Workspaces() {
     const { user, logout } = useAuth()
@@ -51,21 +52,7 @@ export default function Workspaces() {
     return (
         <div className="min-h-screen bg-gray-950 text-white">
             
-            {/* Navbar */}
-            <div className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
-                <div className="flex items-center gap-6">
-                    <h1 className="text-xl font-bold cursor-pointer" onClick={() => navigate('/dashboard')}>Atlas</h1>
-                    <nav className="flex gap-4 text-sm">
-                        <button onClick={() => navigate('/dashboard')} className="text-gray-500 hover:text-white transition">Documents</button>
-                        <button className="text-white font-medium">Workspaces</button>
-                    </nav>
-                </div>
-                <div className="flex items-center gap-4">
-                    <span className="text-gray-400 text-sm">{user?.email}</span>
-                    <button onClick={() => navigate('/profile')} className="text-gray-500 hover:text-white text-sm transition">Profile</button>
-                    <button onClick={logout} className="text-gray-500 hover:text-white text-sm transition">Logout</button>
-                </div>
-            </div>
+            <Navbar />
             
             <div className="max-w-4xl mx-auto px-6 py-10">
                 

@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { updateProfile, changePassword } from "../api/users";
+import Navbar from "../components/Navbar";
 
 export default function Profile() {
     const { user, logout, refreshUser } = useAuth()
@@ -71,20 +72,7 @@ export default function Profile() {
     return (
         <div className="min-h-screen bg-gray-950 text-white">
             
-            {/* Navbar */}
-            <div className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
-                <div className="flex items-center gap-6">
-                    <h1 className="text-xl font-bold cursor-pointer" onClick={() => navigate('/dashboard')}>Atlas</h1>
-                    <nav className="flex gap-4 text-sm">
-                        <button onClick={() => navigate('/dashboard')} className="text-gray-500 hover:text-white transition">Documents</button>
-                        <button onClick={() => navigate('/workspaces')} className="text-gray-500 hover:text-white transition">Workspaces</button>
-                    </nav>
-                </div>
-                <div className="flex items-center gap-4">
-                    <span className="text-gray-400 text-sm">{user?.email}</span>
-                    <button onClick={logout} className="text-gray-500 hover:text-white text-sm transition">Logout</button>
-                </div>
-            </div>
+            <Navbar />
             
             <div className="max-w-2xl mx-auto px-6 py-10">
                 <h2 className="text-2xl font-bold mb-8">Profile Settings</h2>

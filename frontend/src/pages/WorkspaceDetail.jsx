@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { getWorkspace, deleteWorkspace, addDocumentToWorkspace, removeDocumentFromWorkspace } from '../api/workspaces'
 import { getDocuments } from '../api/documents'
 import { useAuth } from '../context/AuthContext'
+import Navbar from '../components/Navbar'
 
 export default function WorkspaceDetail() {
     const { id } = useParams()
@@ -73,18 +74,14 @@ export default function WorkspaceDetail() {
     return (
         <div className="min-h-screen bg-gray-950 text-white">
             
-            {/* Navbar */}
-            <div className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
-                <div className='flex items-center gap-3'>
-                    <button onClick={() => navigate('/workspaces')} className="text-gray-500 hover:text-white transition text-sm">
-                        ← Workspaces
-                    </button>
-                    <span className="text-gray-700">|</span>
-                    <h1 className="text-white font-medium text-sm">{workspace.name}</h1>
-                </div>
+            <Navbar />
+            <div className="px-6 py-3 border-b border-gray-800 flex items-center justify-between">
+                <button onClick={() => navigate('/workspaces')} className="text-gray-500 hover:text-white transition text-sm">
+                    ← Back to Workspaces
+                </button>
                 {isOwner && (
                     <button onClick={handleDelete} className="text-gray-600 hover:text-red-400 transition text-sm">
-                        Delete
+                        Delete Workspace
                     </button>
                 )}
             </div>
