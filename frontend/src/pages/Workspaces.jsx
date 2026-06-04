@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { getWorkspaces, createWorkspace, joinWorkspace } from "../api/workspaces";
 import { useAuth } from '../context/AuthContext'
 import Navbar from "../components/Navbar";
+import SkeletonWorkspace from '../components/SkeletonWorkspace'
 
 export default function Workspaces() {
     const { user, logout } = useAuth()
@@ -133,7 +134,9 @@ export default function Workspaces() {
                 
                 {/* Workspace list */}
                 {loading ? (
-                    <div className="text-center text-gray-600 py-20">Loading...</div>
+                    <div className="grid gap-4">
+                        {[...Array(3)].map((_, i) => <SkeletonWorkspace key={i} />)}
+                    </div>
                 ) : workspaces.length === 0 ? (
                     <div className="text-center py-20">
                         <div className="text-5xl mb-4">👥</div>

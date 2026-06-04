@@ -4,6 +4,7 @@ import { getWorkspace, deleteWorkspace, addDocumentToWorkspace, removeDocumentFr
 import { getDocuments } from '../api/documents'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
+import SkeletonDocument from '../components/SkeletonDocument'
 
 export default function WorkspaceDetail() {
     const { id } = useParams()
@@ -59,11 +60,7 @@ export default function WorkspaceDetail() {
     const sharedDocIds = workspace?.documents?.map(d => d.document.id) || []
     const unsharedDocs = myDocs.filter(d => !sharedDocIds.includes(d.id))
     
-    if (loading) return (
-        <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-            <p className="text-gray-500">Loading workspace...</p>
-        </div>
-    )
+    if (loading) return <SkeletonDocument />
     
     if (!workspace) return (
         <div className="min-h-screen bg-gray-950 flex items-center justify-center">

@@ -6,6 +6,7 @@ import DocumentCard from "../components/DocumentCard";
 import SearchBar from "../components/SearchBar";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import SkeletonCard from '../components/SkeletonCard'
 
 export default function Dashboard() {
     const { user, logout } = useAuth()
@@ -59,7 +60,9 @@ export default function Dashboard() {
                 
                 {/* Documents grid */}
                 {loading ? (
-                    <div className="text-center text-gray-600 py-20">Loading...</div>
+                    <div className="grid gap-4">
+                        {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
+                    </div>
                 ) : documents.length === 0 ? (
                     <div className="text-center py-20">
                         <div className="text-5xl mb-4">📭</div>

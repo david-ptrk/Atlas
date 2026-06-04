@@ -4,6 +4,7 @@ import { getDocument, deleteDocument, askQuestion } from "../api/documents";
 import NotesPanel from "../components/NotesPanel";
 import CitationPanel from "../components/CitationPanel";
 import Navbar from "../components/Navbar";
+import SkeletonDocument from '../components/SkeletonDocument'
 
 export default function DocumentDetail() {
     const { id } = useParams()
@@ -96,13 +97,7 @@ export default function DocumentDetail() {
         })
     }
     
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-                <p className="text-gray-500">Loading document...</p>
-            </div>
-        )
-    }
+    if (loading) return <SkeletonDocument />
     
     if (!doc) {
         return (
