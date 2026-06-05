@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, href } from 'react-router-dom'
-import { getDocument, deleteDocument, askQuestion } from "../api/documents";
+import { getDocument, deleteDocument, askQuestion, regenerateSummary } from "../api/documents";
 import NotesPanel from "../components/NotesPanel";
 import CitationPanel from "../components/CitationPanel";
 import Navbar from "../components/Navbar";
@@ -18,6 +18,7 @@ export default function DocumentDetail() {
     const [asking, setAsking] = useState(false)
     const [showAskBox, setShowAskBox] = useState(false)
     const askBoxRef = useRef(null)
+    const [regenerating, setRegenerating] = useState(false)
     
     useEffect(() => {
         getDocument(id)
@@ -56,6 +57,20 @@ export default function DocumentDetail() {
         if (!confirm('Delete this document?')) return
         await deleteDocument(id)
         navigate('/dashboard')
+    }
+    
+    const handleRegenerate = async () => {
+        setRegenerating(true)
+        try {
+            const res = await regenerateSummary(id)
+            setDoc(prev => ({ ...prev, summary: res.summary }))
+        }
+        catch (err) {
+            console.error(err)
+        }
+        finally {
+            setRegenerating(false)
+        }
     }
     
     const formatSize = (bytes) => {
@@ -168,7 +183,29 @@ export default function DocumentDetail() {
                 {/* Tab content */}
                 <div className="bg-gray-900 rounded-xl p-6 mb-6">
                     {activeTab === 'summary' ? (
-                        <div className="leading-relaxed">{renderSummary(doc.summary)}</div>
+                        <div>
+                            <div className="flex justify-end mb-4">
+                                <button
+                                    onClick={handleRegenerate}
+                                    disabled={regenerating}
+                                    className="text-gray-500 hover:text-blue-400 text-xs transition disabled:opacity-50 flex items-center gap-1"
+                                >
+                                    {regenerating ? 'Regenerating...' : '↻ Regenerate Summary'}
+                                </button>
+                            </div>
+                            <div className="leading-relaxed">
+                                {regenerating ? (
+                                    <div className="space-y-3 animate-pulse">
+                                        <div className="h-4 bg-gray-800 rounded w-1/4 mb-4" />
+                                        <div className="h-3 bg-gray-800 rounded w-full" />
+                                        <div className="h-3 bg-gray-800 rounded w-5/6" />
+                                        <div className="h-3 bg-gray-800 rounded w-4/5" />
+                                    </div>
+                                ) : (
+                                    renderSummary(doc.summary)
+                                )}
+                            </div>
+                        </div>
                     ) : activeTab === 'text' ? (
                         <div
                             onMouseUp={handleTextSelection}

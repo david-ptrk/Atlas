@@ -73,3 +73,8 @@ export const updateCitationMetadata = async (id, metadata) => {
     const res = await api.post(`/documents/${id}/citation/`, metadata)
     return res.data
 }
+
+export const regenerateSummary = async (id) => {
+    const res = await api.post(`/documents/${id}/regenerate/`)
+    return res.data
+}

@@ -234,3 +234,23 @@ class DocumentCitationView(APIView):
             url=document.url
         )
         return Response({'citations': citations})
+
+class DocumentRegenerateSummaryView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, pk):
+        try:
+            document = Document.objects.get(pk=pk, user=request.user)
+        except Document.DoesNotExist:
+            return Response({'error': 'Document not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        if not document.extracted_text:
+            return Response({'error': 'No text extracted from this document.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            summary = generate_summary(document.extracted_text)
+            document.summary = summary
+            document.save()
+            return Response({'summary': summary})
+        except Exception as e:
+            return Response({'error': 'Failed to regenerate summary.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
