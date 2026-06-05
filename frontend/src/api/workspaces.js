@@ -32,3 +32,8 @@ export const addDocumentToWorkspace = async (workspaceId, documentId) => {
 export const removeDocumentFromWorkspace = async (workspaceId, documentId) => {
     await api.delete(`/workspaces/${workspaceId}/documents/${documentId}/`)
 }
+
+export const leaveWorkspace = async (id) => {
+    const res = await api.post(`/workspaces/${id}/leave/`)
+    return res.data
+}

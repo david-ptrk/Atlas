@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { getWorkspace, deleteWorkspace, addDocumentToWorkspace, removeDocumentFromWorkspace } from '../api/workspaces'
+import { getWorkspace, deleteWorkspace, addDocumentToWorkspace, removeDocumentFromWorkspace, leaveWorkspace } from '../api/workspaces'
 import { getDocuments } from '../api/documents'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
@@ -56,6 +56,17 @@ export default function WorkspaceDetail() {
         setTimeout(() => setCopied(false), 2000)
     }
     
+    const handleLeave = async () => {
+        if (!confirm('Leave this workspace?')) return
+        try {
+            await leaveWorkspace(id)
+            navigate('/workspaces')
+        }
+        catch (err) {
+            alert(err.response?.data?.error || 'Failed to leave workspace.')
+        }
+    }
+    
     const isOwner = workspace?.owner_email === user?.email
     const sharedDocIds = workspace?.documents?.map(d => d.document.id) || []
     const unsharedDocs = myDocs.filter(d => !sharedDocIds.includes(d.id))
@@ -76,9 +87,13 @@ export default function WorkspaceDetail() {
                 <button onClick={() => navigate('/workspaces')} className="text-gray-500 hover:text-white transition text-sm">
                     ← Back to Workspaces
                 </button>
-                {isOwner && (
+                {isOwner ? (
                     <button onClick={handleDelete} className="text-gray-600 hover:text-red-400 transition text-sm">
                         Delete Workspace
+                    </button>
+                ) : (
+                    <button onClick={handleLeave} className="text-gray-600 hover:text-red-400 transition text-sm">
+                        Leave Workspace
                     </button>
                 )}
             </div>

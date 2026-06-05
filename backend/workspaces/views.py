@@ -121,3 +121,21 @@ class WorkspaceDocumentView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Workspace.DoesNotExist:
             return Response({'error': 'Workspace not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+class WorkspaceLeaveView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, pk):
+        try:
+            workspace = Workspace.objects.get(pk=pk)
+        except Workspace.DoesNotExist:
+            return Response({'error': 'Workspace not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        if workspace.owner == request.user:
+            return Response({'error': 'You are the owner. Delete the workspace instead.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        deleted, _ = WorkspaceMember.objects.filter(workspace=workspace, user=request.user).delete()
+        if not deleted:
+            return Response({'error': 'You are not a member of this workspace.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({'message': 'Left workspace successfully.'}, status=status.HTTP_200_OK)
