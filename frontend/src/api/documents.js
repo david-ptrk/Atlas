@@ -78,3 +78,8 @@ export const regenerateSummary = async (id) => {
     const res = await api.post(`/documents/${id}/regenerate/`)
     return res.data
 }
+
+export const researchChat = async (question) => {
+    const res = await api.post('/documents/chat/', { question })
+    return res.data
+}

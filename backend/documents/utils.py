@@ -164,3 +164,37 @@ def generate_citations(title, author, publication_date, publisher, url):
         chicago += f" Accessed from {url}."
     
     return {'apa': apa, 'mla': mla, 'chicago': chicago}
+
+def research_chat(question, context):
+    """Answer a question based on all relevant documents."""
+    try:
+        client = Groq(api_key=settings.GROQ_API_KEY)
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {
+                    "role": "system",
+                    "content": """You are Atlas, an AI research assistant. You have access to the user's uploaded research documents.
+Answer questions based on the provided document context. 
+- Be specific and cite which document you're referencing
+- If information spans multiple documents, connect the ideas
+- If the answer isn't in the documents, say so clearly
+- Be conversational but precise"""
+                },
+                {
+                    "role": "user",
+                    "content": f"""Based on my research documents, answer this question:
+
+{question}
+
+Context from my documents:
+{context}"""
+                }
+            ],
+            temperature=0.4,
+            max_tokens=1000,
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        print(f"Research chat error: {e}")
+        return "Sorry, I could not process your question. Please try again."

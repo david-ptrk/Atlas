@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from .models import Document, Note
 from .serializers import DocumentSerializer, DocumentDetailSerializer, NoteSerializer
-from .utils import extract_text_from_pdf, generate_summary, ask_question, generate_embedding, generate_citations, extract_metadata
+from .utils import extract_text_from_pdf, generate_summary, ask_question, generate_embedding, generate_citations, extract_metadata, research_chat
 import os
 from django.db import models
 from pgvector.django import CosineDistance
@@ -254,3 +254,44 @@ class DocumentRegenerateSummaryView(APIView):
             return Response({'summary': summary})
         except Exception as e:
             return Response({'error': 'Failed to regenerate summary.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ResearchChatView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        question = request.data.get('question', '').strip()
+        if not question:
+            return Response({'error': 'Question is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get relevant document chunks using semantic search
+        query_embedding = generate_embedding(question)
+        
+        if query_embedding:
+            relevant_docs = Document.objects.filter(
+                user=request.user,
+                embedding__isnull=False
+            ).annotate(
+                distance=CosineDistance('embedding', query_embedding)
+            ).filter(
+                distance__lt=0.9
+            ).order_by('distance')[:5]
+        else:
+            relevant_docs = Document.objects.filter(
+                user=request.user
+            ).order_by('-created_at')[:5]
+        
+        if not relevant_docs:
+            return Response({'answer': "I couldn't find any relevant documents. Please upload some documents first.", 'sources': []})
+        
+        # Build context from revelant documents
+        context_parts = []
+        sources = []
+        for doc in relevant_docs:
+            if doc.extracted_text:
+                context_parts.append(f"Document: {doc.title}\n{doc.extracted_text[:2000]}")
+                sources.append({'id': doc.id, 'title': doc.title})
+        
+        context = "\n\n---\n\n".join(context_parts)
+        answer = research_chat(question, context)
+        
+        return Response({'answer': answer, 'sources': sources})
