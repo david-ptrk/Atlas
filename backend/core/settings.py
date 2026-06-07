@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'users',
     'documents',
     'workspaces',
+    'chat',
 ]
 
 MIDDLEWARE = [
