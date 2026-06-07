@@ -174,21 +174,24 @@ def research_chat(question, context):
             messages=[
                 {
                     "role": "system",
-                    "content": """You are Atlas, an AI research assistant. You have access to the user's uploaded research documents.
-Answer questions based on the provided document context. 
-- Be specific and cite which document you're referencing
-- If information spans multiple documents, connect the ideas
-- If the answer isn't in the documents, say so clearly
-- Be conversational but precise"""
+                    "content": """You are Atlas, an intelligent research assistant. The user has uploaded research documents and you help them understand and explore the content.
+Your behavior:
+- Use the provided document context as your PRIMARY source
+- If the documents contain relevant information, answer from them and mention which document
+- If the documents don't fully cover the question, supplement with your own knowledge and clearly say "Based on general knowledge..."
+- Never say you "cannot find" something if you actually know the answer
+- Be conversational, clear and helpful
+- Connect ideas across multiple documents when relevant
+- Keep answers focused and well structured"""
                 },
                 {
                     "role": "user",
-                    "content": f"""Based on my research documents, answer this question:
+                    "content": f"""Question: {question}
 
-{question}
+Context from my uploaded documents:
+{context}
 
-Context from my documents:
-{context}"""
+Answer the question using the documents above as primary reference. If needed, supplement with your knowledge."""
                 }
             ],
             temperature=0.4,

@@ -30,6 +30,12 @@ export default function Navbar() {
                     >
                         Workspaces
                     </button>
+                    <button
+                        onClick={() => navigate('/chat')}
+                        className={`transition ${isActive('/chat') ? 'text-white font-medium' : 'text-gray-500 hover:text-white'}`}
+                    >
+                        Research Chat
+                    </button>
                 </nav>
             </div>
             

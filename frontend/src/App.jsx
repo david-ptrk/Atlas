@@ -8,6 +8,7 @@ import Workspaces from './pages/Workspaces.jsx'
 import WorkspaceDetail from './pages/WorkspaceDetail.jsx'
 import Profile from './pages/Profile.jsx'
 import NotFound from './pages/NotFound.jsx'
+import ResearchChat from './pages/ResearchChat.jsx'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -26,6 +27,7 @@ function AppRoutes() {
       <Route path="/workspaces" element={<ProtectedRoute><Workspaces /></ProtectedRoute>} />
       <Route path="/workspaces/:id" element={<ProtectedRoute><WorkspaceDetail /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/chat" element={<ProtectedRoute><ResearchChat /></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   )
