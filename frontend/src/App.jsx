@@ -28,6 +28,7 @@ function AppRoutes() {
       <Route path="/workspaces/:id" element={<ProtectedRoute><WorkspaceDetail /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="/chat" element={<ProtectedRoute><ResearchChat /></ProtectedRoute>} />
+      <Route path="/chat/:sessionId" element={<ProtectedRoute><ResearchChat /></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   )
