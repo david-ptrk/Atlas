@@ -125,10 +125,10 @@ export default function ResearchChat() {
         <div className="min-h-screen bg-gray-950 text-white flex flex-col">
             <Navbar />
             
-            <div className="flex flex-1 overflow-hidden" style={{ height: 'calc(100vh - 57px)' }}>
+            <div className="flex overflow-hidden" style={{ height: 'calc(100vh - 57px)' }}>
                 
                 {/* Sidebar */}
-                <div className="w-64 border-r border-gray-800 flex flex-col shrink-0">
+                <div className="w-64 border-r border-gray-800 flex flex-col shrink-0 h-full">
                     <div className="p-4 border-b border-gray-800">
                         <button
                             onClick={handleNewChat}
@@ -174,7 +174,7 @@ export default function ResearchChat() {
                 </div>
                 
                 {/* Chat area */}
-                <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="flex-1 flex flex-col h-full overflow-hidden">
                     
                     {/* Chat header */}
                     {activeSession && (
@@ -261,7 +261,7 @@ export default function ResearchChat() {
                     </div>
                     
                     {/* Input */}
-                    <div className="border-t border-gray-800 px-6 py-4">
+                    <div className="border-t border-gray-800 px-6 py-4 shrink-0">
                         <div className="max-w-3xl mx-auto flex gap-3">
                             <textarea
                                 value={question}
