@@ -28,7 +28,7 @@ class ChatSessionDetailView(APIView):
     
     def get(self, request, pk):
         try:
-            session = ChatSession.objects.get(pk=pk, user=request.user)
+            session = ChatSession.objects.get(id=pk, user=request.user)
             serializer = ChatSessionDetailSerializer(session)
             return Response(serializer.data)
         except ChatSession.DoesNotExist:
@@ -36,7 +36,7 @@ class ChatSessionDetailView(APIView):
     
     def put(self, request, pk):
         try:
-            session = ChatSession.objects.get(pk=pk, user=request.user)
+            session = ChatSession.objects.get(id=pk, user=request.user)
             session.title = request.data.get('title', session.title)
             session.save()
             return Response(ChatSessionSerializer(session).data)
@@ -45,7 +45,7 @@ class ChatSessionDetailView(APIView):
     
     def delete(self, request, pk):
         try:
-            session = ChatSession.objects.get(pk=pk, user=request.user)
+            session = ChatSession.objects.get(id=pk, user=request.user)
             session.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except ChatSession.DoesNotExist:
@@ -56,7 +56,7 @@ class ChatMessageView(APIView):
     
     def post(self, request, pk):
         try:
-            session = ChatSession.objects.get(pk=pk, user=request.user)
+            session = ChatSession.objects.get(id=pk, user=request.user)
         except ChatSession.DoesNotExist:
             return Response({'error': 'Chat not found.'}, status=status.HTTP_404_NOT_FOUND)
         
