@@ -3,15 +3,41 @@ from dotenv import load_dotenv
 import os
 from datetime import timedelta
 
-load_dotenv()
-
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR.parent / '.env')
 
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-in-production')
+SECRET_KEY = os.getenv(
+    'SECRET_KEY',
+    'django-insecure-local-development-only'
+)
 
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = ['*']
+# Production security settings
+SECURE_SSL_REDIRECT = os.getenv(
+    'SECURE_SSL_REDIRECT', 'False'
+).lower() == 'true'
+
+SESSION_COOKIE_SECURE = os.getenv(
+    'SESSION_COOKIE_SECURE', 'False'
+).lower() == 'true'
+
+CSRF_COOKIE_SECURE = os.getenv(
+    'CSRF_COOKIE_SECURE', 'False'
+).lower() == 'true'
+
+SECURE_HSTS_SECONDS = int(
+    os.getenv('SECURE_HSTS_SECONDS', '0')
+)
+
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv(
+        'ALLOWED_HOSTS',
+        'localhost,127.0.0.1'
+    ).split(',')
+    if host.strip()
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -94,11 +120,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS — allow React dev server
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
+    origin.strip()
+    for origin in os.getenv(
+        'CORS_ALLOWED_ORIGINS',
+        'http://localhost:5173,http://127.0.0.1:5173'
+    ).split(',')
+    if origin.strip()
 ]
-
-CORS_ALLOW_ALL_ORIGINS = True
 
 # JWT Auth
 REST_FRAMEWORK = {

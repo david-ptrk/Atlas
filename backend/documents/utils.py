@@ -1,15 +1,38 @@
-import fitz
+import pymupdf
 from groq import Groq
 from django.conf import settings
 from sentence_transformers import SentenceTransformer
 import json
+from pathlib import Path
 
-embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+embedding_model = None
+
+def get_embedding_model():
+    global embedding_model
+    
+    if embedding_model is None:
+        local_model_path = (
+            settings.BASE_DIR.parent / 'models' / 'all-MiniLM-L6-v2'
+        )
+        
+        if local_model_path.is_dir():
+            print("Loading local embedding model...")
+            embedding_model = SentenceTransformer(
+                str(local_model_path),
+                local_files_only=True
+            )
+        else:
+            print("Downloading embedding model from Hugging Face...")
+            embedding_model = SentenceTransformer(
+                'sentence-transformers/all-MiniLM-L6-v2'
+            )
+    
+    return embedding_model
 
 def extract_text_from_pdf(file_path):
     """Extract raw text from a PDF file."""
     try:
-        doc = fitz.open(file_path)
+        doc = pymupdf.open(file_path)
         text = ""
         for page in doc:
             text += page.get_text()
@@ -22,7 +45,8 @@ def extract_text_from_pdf(file_path):
 def generate_embedding(text):
     """Generate a vector embedding for the given text."""
     try:
-        embedding = embedding_model.encode(text[:1000])
+        model = get_embedding_model()
+        embedding = model.encode(text[:1000])
         return embedding.tolist()
     except Exception as e:
         print(f"Embedding generation error: {e}")
@@ -33,7 +57,7 @@ def generate_summary(text):
     try:
         client = Groq(api_key=settings.GROQ_API_KEY)
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-120b",
             messages=[
                 {
                     "role": "system",
@@ -78,7 +102,7 @@ def ask_question(document_text, highlighted_text, question):
             context = f"Document:\n{document_text[:4000]}"
         
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="openai/gpt-oss-20b",
             messages=[
                 {
                     "role": "system",
@@ -102,7 +126,7 @@ def extract_metadata(text):
     try:
         client = Groq(api_key=settings.GROQ_API_KEY)
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="openai/gpt-oss-20b",
             messages=[
                 {
                     "role": "system",
@@ -124,13 +148,24 @@ Return only valid JSON like:
                 }
             ],
             temperature=0.1,
-            max_tokens=200,
+            max_tokens=500,
         )
-        content = response.choices[0].message.content.strip()
+        
+        message = response.choices[0].message
+        content = message.content
+        
+        if not content:
+            print("Metadata extraction returned empty content.")
+            print("Finish reason:", response.choices[0].finish_reason)
+            return {}
+        
+        content = content.strip()
         content = content.replace('```json', '').replace('```', '').strip()
         return json.loads(content)
     except Exception as e:
         print(f"Metadata extraction error: {e}")
+        if 'response' in locals():
+            print("Raw metadata response:", response.choices[0].message)
         return {}
 
 def generate_citations(title, author, publication_date, publisher, url):
@@ -170,7 +205,7 @@ def research_chat(question, context):
     try:
         client = Groq(api_key=settings.GROQ_API_KEY)
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-120b",
             messages=[
                 {
                     "role": "system",
