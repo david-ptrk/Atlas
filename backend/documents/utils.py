@@ -29,11 +29,12 @@ def get_embedding_model():
     
     return embedding_model
 
-def extract_text_from_pdf(file_path):
+def extract_text_from_pdf(file_content):
     """Extract raw text from a PDF file."""
     try:
-        doc = pymupdf.open(file_path)
+        doc = pymupdf.open(stream=file_content, filetype="pdf")
         text = ""
+        
         for page in doc:
             text += page.get_text()
         doc.close()

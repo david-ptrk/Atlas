@@ -5,7 +5,6 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Document, Note
 from .serializers import DocumentSerializer, DocumentDetailSerializer, NoteSerializer
 from .utils import extract_text_from_pdf, generate_summary, ask_question, generate_embedding, generate_citations, extract_metadata, research_chat
-import os
 from django.db import models
 from pgvector.django import CosineDistance
 
@@ -42,8 +41,11 @@ class DocumentUploadView(APIView):
         
         # Extract text and generate summary
         try:
-            file_path = document.file.path
-            extracted_text = extract_text_from_pdf(file_path)
+            document.file.open('rb')
+            file_content = document.file.read()
+            document.file.close()
+            
+            extracted_text = extract_text_from_pdf(file_content)
             summary = generate_summary(extracted_text) if extracted_text else ""
             embedding = generate_embedding(extracted_text) if extracted_text else None
             metadata = extract_metadata(extracted_text) if extracted_text else {}
@@ -78,8 +80,9 @@ class DocumentDetailView(APIView):
     def delete(self, request, pk):
         try:
             document = Document.objects.get(pk=pk, user=request.user)
-            if document.file and os.path.isfile(document.file.path):
-                os.remove(document.file.path)
+            if document.file:
+                document.file.delete(save=False)
+            
             document.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Document.DoesNotExist:
